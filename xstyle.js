@@ -58,7 +58,7 @@ define("xstyle/xstyle", ["require"], function (require) {
 		}
 		if(needsParsing){
 			// ok, determined that CSS extensions are in the CSS, need to get the source and really parse it
-			parse(sheet.source || sheet.ownerElement.innerHTML, sheet, callback);
+			parse(sheet.source || (sheet.ownerElement || sheet.ownerNode).innerHTML, sheet, callback);
 		}
 	}
 	function parse(css, styleSheet, callback) {
