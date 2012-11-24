@@ -4,10 +4,6 @@
 */
 define([],function(){
 
-	/*var filters = {
-		return "filter: progid:DXImageTransform.Microsoft.DropShadow(
-		
-	}*/
 	return {
 		onProperty: function(name, value){
 			var parts = value.split(/\s+/);
@@ -20,10 +16,23 @@ define([],function(){
 			}
 			if(name == "transform" && value.match(/rotate/)){
 				var angle = value.match(/rotate\(([-\.0-9]+)deg\)/)[1] / 180 * Math.PI;
+                var deg = value.match(/rotate\(([-\.0-9]+deg)\)/)[1];
 				var cos = Math.cos(angle);
 				var sin = Math.sin(angle);
-				return "filter: progid:DXImageTransform.Microsoft.Matrix(" + 
-                     "M11=" + cos +", M12=" + (-sin) + ",M21=" + sin + ", M22=" + cos + ", sizingMethod='auto expand');";
+				return [
+                    "-ms-transform: rotate(", deg, ");",
+                    "filter: progid:DXImageTransform.Microsoft.Matrix(",
+                        "M11=",
+                        String(cos),
+                        ", M12=",
+                        String(-sin),
+                        ",M21=",
+                        String(sin),
+                        ", M22=",
+                        String(cos),
+                        ", sizingMethod='auto expand');",
+                    "zoom: 1;"
+                    ].join("");
 			}
 		}
 	};

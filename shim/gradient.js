@@ -14,13 +14,20 @@ define(["../xstyle"],function(xstyle){
 		"-o-": function(type, position, from, to){
 			return "background-image: -o-" + type + "(" + position + "," + from + "," + to + ")";
 		},
-		"-ms-": function(type, position, from, to){
-			
+		"-ms-": function(type, position, from, to){		
 			from = from.match(colorString);
 			to = to.match(colorString);
-			if(from && to){ 
-				// must disable border radius for IE
-				return "border-radius: 0px; filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#FF" + from[1] + ",endColorstr=#FF" + to[1] +",gradientType=" + (position=="left" ? 1 : 0) + ");";
+			if(from && to){
+                return [
+                    "-ms-linear-gradient(" + from + ", " + to + ");",
+                    "filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#FF",
+                        from[1],
+                        ",endColorstr=#FF",
+                        to[1],
+                        ",gradientType=",
+                        (position == "left" ? "1" : "0"),
+                        ");",
+                    "zoom: 1;"].join("");
 			}
 		}
 	}[vendor];

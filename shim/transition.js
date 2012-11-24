@@ -60,14 +60,15 @@ define(["../xstyle", "../elemental"],function(xstyle, elemental){
 	var units = /([-0-9\.]+)([\w]+)/;
 	function parseUnits(value){
 		var match = value.match(rgb);
+        var parts;
 		if(match){
-			var parts = match[1].split(",");
+			parts = match[1].split(",");
 			for(var i = 0; i < 4; i++){
 				parts[0] = +(parts[0] || 0);
 			}
-		}else if(match = value.match(hex)){
+		}else if(!!(match = value.match(hex))){
 			match = match[1];
-			var parts = [];
+			parts = [];
 			var shortHex = match.length == 3;
 			parts[0] = parseInt(match[0] + match[shortHex ? 0 : 1], 16);
 			parts[1] = parseInt(match[shortHex ? 1 : 2] + match[shortHex ? 1 : 3], 16);
@@ -75,7 +76,7 @@ define(["../xstyle", "../elemental"],function(xstyle, elemental){
 //			parts[3] = parseInt(match[6] ? match[6] + match[7] : 0);
 			parts.units = "rgb";
 			return parts;
-		}else if(match = value.match(units)){
+		}else if(!!(match = value.match(units))){
 			parts = [match[1]];
 			parts.units = match[2];
 			return parts;
@@ -103,7 +104,7 @@ define(["../xstyle", "../elemental"],function(xstyle, elemental){
 			return mid[0] + start.units; 
 		}
 	}
-	var transitions = [];
+	//var transitions = [];
 	var currentTime = new Date().getTime();
 	var period = 30;
 	setInterval(function(){
@@ -118,7 +119,7 @@ define(["../xstyle", "../elemental"],function(xstyle, elemental){
 	}, period);
 	function updateTransition(transition){
 		var element = transition.element;
-		runtimeStyle = element.runtimeStyle;
+		var runtimeStyle = element.runtimeStyle;
 		var t = transition.t = (currentTime - transition.startTime) / 1000 / transition.duration;
 		if(t >= 1){
 			// this means the transition is done, remove the runtime styling
@@ -144,9 +145,9 @@ define(["../xstyle", "../elemental"],function(xstyle, elemental){
 		}
 	}
 	function easing(t){
-		var v = ((x0 - Math.sqrt(x0*x0 + t*(x1-2*x0)))/(2*x0-x1) * 2 / 3 * (1-t) * (1-t) +
-			((x1-x0 - Math.sqrt((x1-x0)*(x1-x0) + (t-x0)*((1-x0)-2*(x1-x0)))) / (2*(x1-x0)-1+x0) * 2 / 3 + 1/3) * t *t) / ((1-t) * (1-t) + t * t);
-		var v = (x0-x1 + Math.sqrt((x1-x0)*(x1-x0) - (1+x0-t)*(x0-2*x1)))/(1+x0-t);
+		//var v = ((x0 - Math.sqrt(x0*x0 + t*(x1-2*x0)))/(2*x0-x1) * 2 / 3 * (1-t) * (1-t) +
+		//	((x1-x0 - Math.sqrt((x1-x0)*(x1-x0) + (t-x0)*((1-x0)-2*(x1-x0)))) / (2*(x1-x0)-1+x0) * 2 / 3 + 1/3) * t *t) / ((1-t) * (1-t) + t * t);
+		//var v = (x0-x1 + Math.sqrt((x1-x0)*(x1-x0) - (1+x0-t)*(x0-2*x1)))/(1+x0-t);
 		
 		return t*t*(1-t)+(1-(1-t)*(1-t))*t;
 	}
