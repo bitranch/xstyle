@@ -231,13 +231,13 @@ define([], function(){
 					// fully parsed / processed in Opera, so use setTimeout.
 					// Opera will process before the it next enters the event loop
 					// (so 0 msec is enough time).
-					if(--loadingCount == 0){
+					if(--loadingCount === 0){
 						// TODO: move this setTimeout to loadHandler
-						callback(link.sheet || link.styleSheet)
+						callback(link.sheet || link.styleSheet);
 						// TODO: Is this need for Opera?
 						//setTimeout(onCssLoaded,0);
 					}
-				}
+				};
 
 				// after will become truthy once the loop executes a second time
 				for(var i = 0, after; i < resources.length; i++, after = url){
