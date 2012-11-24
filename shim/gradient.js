@@ -1,7 +1,8 @@
 /*
     Handles gradients
 */
-define([],function(vendor){
+define(["../xstyle"],function(xstyle){
+    var vendor = xstyle.vendorPrefix;
 	var colorString = /#(\w{6})/;
 	var createGradient = {
 		"-webkit-": function(type, position, from, to){
@@ -22,7 +23,7 @@ define([],function(vendor){
 				return "border-radius: 0px; filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#FF" + from[1] + ",endColorstr=#FF" + to[1] +",gradientType=" + (position=="left" ? 1 : 0) + ");";
 			}
 		}
-	}[vendor.prefix];
+	}[vendor];
 	return {
 		onIdentifier: function(name, value, rule){
 			var parts = value.match(/(\w+-gradient)\(([^\)]*)\)/);

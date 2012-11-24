@@ -29,7 +29,7 @@ define("xstyle/xstyle", ["require"], function (require) {
 		ua.indexOf("Opera") > -1 ? "-o-" : "";
 	function checkImports(element, callback, fixedImports){
 		var sheet = element.sheet || element.styleSheet;
-		var needsParsing = sheet.needsParsing, // load-imports can check for the need to parse when it does it's recursive look at imports 
+		var needsParsing = sheet.needsParsing, // load-imports can check for the need to parse when it does its recursive look at imports 
 			cssRules = sheet.rules || sheet.cssRules;
 		function fixImports(){
 			// need to fix imports, applying load-once semantics for all browsers, and flattening for IE to fix nested @import bugs
@@ -67,12 +67,13 @@ define("xstyle/xstyle", ["require"], function (require) {
 			// only FF doesn't have this
 			styleSheet.addRule = function(selector, style, index){
 				return this.insertRule(selector + "{" + style + "}", index >= 0 ? index : this.cssRules.length);
-			}
+			};
 		}
 		if(!styleSheet.deleteRule){
-			styleSheet.deleteRule = sheet.removeRule;
+			styleSheet.deleteRule = styleSheet.removeRule;
 		}
-		var handlers = {property:{}};
+		var handlers = {property:{}},
+            values = [];
 		function addHandler(type, name, module){
 			var handlersForType = handlers[type] || (handlers[type] = {});
 			handlersForType[name] = module;
@@ -84,10 +85,14 @@ define("xstyle/xstyle", ["require"], function (require) {
 			addHandler("selector", 'x-' + type, {
 				onRule: function(rule){
 					rule.eachProperty(function(name, value){
+                        var parts;
 						do{
-							var parts = value.match(/require\s*\((.+)\)|([^, ]+)([, ]+(.+))?/);
-							if(parts[1]){
-								return addHandler(type, name, parts[1]);
+							parts = value.match(/require\s*\((.+)\)|([^, ]+)([, ]+(.+))?/);
+							if (parts[1]) {
+							    if (type === "value") {
+							        values.push(name);
+							    }
+							    return addHandler(type, name, parts[1]);
 							}
 							var first = parts[2];
 							if(first == "default"){
@@ -109,7 +114,7 @@ define("xstyle/xstyle", ["require"], function (require) {
 									return value;
 								});
 							}
-						}while(value = parts[4]);
+						}while(!!(value = parts[4]));
 /*						var ifUnsupported = value.charAt(value.length - 1) == "?";
 						value = value.replace(/require\s*\(|\)\??/g, '');
 						if(!ifUnsupported || typeof testDiv.style[name] != "string"){ // if conditioned on support, test to see browser has that style
@@ -129,11 +134,10 @@ define("xstyle/xstyle", ["require"], function (require) {
 		addExtensionHandler("pseudo");
 		var waiting = 1;
 		var baseUrl = (styleSheet.href || location.href).replace(/[^\/]+$/,'');
-		var properties = [], values = [];
+		var properties = [];
 		var valueModules = {};
 		
 		var convertedRules = [];
-		var valueRegex = new RegExp("(?:^|\\W)(" + values.join("|") + ")(?:$|\\W)");
 		function Rule () {}
 		Rule.prototype = {
 			eachProperty: function (onproperty, propertyRegex) {
@@ -238,7 +242,7 @@ define("xstyle/xstyle", ["require"], function (require) {
 					}else{
 						ruleHandled(result);
 					}
-				}
+				};
 				typeof module == "string" ? require([module], onLoad) : onLoad(module);					
 			}
 		}
@@ -268,8 +272,9 @@ define("xstyle/xstyle", ["require"], function (require) {
 				// TODO: use a specialized regex that only looks for registered properties
 				lastRule.cssText.replace(/\s*([^;:]+)\s*:\s*([^;]+)?/g, function (full, name, value) {
 					onProperty(name, value);
+                    var valueRegex = new RegExp("(?:^|\\W)(" + values.join("|") + ")(?:$|\\W)");
 					value.replace(valueRegex, function(t, identifier){
-						//onIdentifier(identifier, name, value);
+			            onIdentifier(identifier, name, value);
 					});
 				});
 				if(lastRule.children){
